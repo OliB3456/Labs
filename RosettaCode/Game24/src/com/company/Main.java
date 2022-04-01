@@ -24,13 +24,11 @@ public class Main {
     }
 
     private static String intArrToString(int[] arr) {
-        String s = "";
+        StringBuilder sb = new StringBuilder();
         for (int i: arr) {
-            s += i + ", ";
-            //s.concat(i + ", ");
+            sb.append(i).append(", ");
         }
-        s = s.substring(0, s.length()-2);
-        return s;
+        return sb.substring(0, sb.length()-2);
     }
 
     private static boolean repeat(String repeat) {
