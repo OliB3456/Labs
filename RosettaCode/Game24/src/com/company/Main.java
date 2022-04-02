@@ -7,7 +7,8 @@ import java.util.stream.IntStream;
 
 public class Main {
 
-    private static Pattern digit;
+    private static Pattern singleDigitPattern = Pattern.compile("[0-9]{1,1}");
+    private static Pattern operatorPattern = Pattern.compile("[\\+\\-\\*/]{1,1}");
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -58,7 +59,7 @@ public class Main {
     }
 
     private static boolean isExpression(String input) {
-        Pattern isExpression = Pattern.compile("([0-9]{1,1}[\\+\\-\\*/]{1,1})*[0-9]{1,1}");
+        Pattern isExpression = Pattern.compile("(" + singleDigitPattern + operatorPattern + ")*" + singleDigitPattern);
         return isExpression.matcher(input).matches();
     }
 
