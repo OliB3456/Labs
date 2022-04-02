@@ -2,11 +2,12 @@ package com.company;
 
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 public class Main {
+
+    private static Pattern digit;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -28,6 +29,7 @@ public class Main {
                 input = input.replaceAll(" ", "");
 
                 if(isExpression(input)) {
+                    System.out.println("Input is a valid mathematical expression...");
                     inputCorrect = checkExpression(input);
                 }
 
@@ -56,7 +58,7 @@ public class Main {
     }
 
     private static boolean isExpression(String input) {
-        Pattern isExpression = Pattern.compile("([0-9]*[\\+\\-\\*/]*)*");
+        Pattern isExpression = Pattern.compile("([0-9]{1,1}[\\+\\-\\*/]{1,1})*[0-9]{1,1}");
         return isExpression.matcher(input).matches();
     }
 
