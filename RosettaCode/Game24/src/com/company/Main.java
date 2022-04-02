@@ -1,5 +1,6 @@
 package com.company;
 
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
@@ -43,6 +44,7 @@ public class Main {
         } while(repeat(scanner.nextLine()));
     }
 
+    // Make generic if possible
     private static String intArrToString(int[] arr) {
         StringBuilder sb = new StringBuilder();
         for (int i: arr) {
@@ -64,6 +66,13 @@ public class Main {
     }
 
     private static boolean checkExpression(String input) {
+        int[] digits = Arrays.stream(input.split(operatorPattern.pattern())).mapToInt(d -> Integer.parseInt(d)).toArray();
+        String[] operators = (String[]) Arrays.stream(input.split(singleDigitPattern.pattern())).toArray();
+        System.out.println("Input digits: " + intArrToString(digits));
+        int result = digits[0];
+        for(int i = 0; i < digits.length; i++) {
+
+        }
         return false;
     }
 }
