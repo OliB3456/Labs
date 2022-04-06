@@ -5,21 +5,23 @@ import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Main {
 
-    private static Pattern singleDigitPattern = Pattern.compile("[0-9]{1,1}");
-    private static Pattern operatorPattern = Pattern.compile("[\\+\\-\\*/]{1,1}");
+    private static final Pattern singleDigitPattern = Pattern.compile("[0-9]{1,1}");
+    private static final Pattern operatorPattern = Pattern.compile("[\\+\\-\\*/]{1,1}");
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         do {
             System.out.println("Generating 4 digits...");
-            int[] digits = IntStream.generate(ThreadLocalRandom.current()::nextInt)
+            Integer[] digits = IntStream.generate(ThreadLocalRandom.current()::nextInt)
                     .filter(i -> 0 <= i && i <= 9)
                     .limit(4)
                     //.peek(i -> System.out.println(""+i))
-                    .toArray();
+                    .boxed()
+                    .toArray(Integer[]::new);
             boolean inputCorrect = false;
 
             String digitsStr = intArrToString(digits);
@@ -44,10 +46,9 @@ public class Main {
         } while(repeat(scanner.nextLine()));
     }
 
-    // Make generic if possible
-    private static String intArrToString(int[] arr) {
+    private static <G> String intArrToString(G[] arr) {
         StringBuilder sb = new StringBuilder();
-        for (int i: arr) {
+        for (G i: arr) {
             sb.append(i).append(", ");
         }
         return sb.substring(0, sb.length()-2);
@@ -66,11 +67,11 @@ public class Main {
     }
 
     private static boolean checkExpression(String input) {
-        int[] digits = Arrays.stream(input.split(operatorPattern.pattern())).mapToInt(d -> Integer.parseInt(d)).toArray();
+        Integer[] digits = Arrays.stream(input.split(operatorPattern.pattern())).map(d -> Integer.valueOf(d)).toArray(Integer[]::new);
         String[] operators = (String[]) Arrays.stream(input.split(singleDigitPattern.pattern())).toArray();
         System.out.println("Input digits: " + intArrToString(digits));
         int result = digits[0];
-        for(int i = 0; i < digits.length; i++) {
+        for (int i = 0; i < digits.length; i++) {
 
         }
         return false;
