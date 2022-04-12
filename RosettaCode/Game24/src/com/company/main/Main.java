@@ -34,7 +34,7 @@ public class Main {
 
                 if(isExpression(input)) {
                     System.out.println("Input is a valid mathematical expression...");
-                    inputCorrect = checkExpression(input);
+                    inputCorrect = checkExpression(input, digits);
                 }
 
                 if(!inputCorrect) {
@@ -66,14 +66,66 @@ public class Main {
         return isExpression.matcher(input).matches();
     }
 
-    private static boolean checkExpression(String input) {
+    private static boolean checkExpression(String input, Integer[] allowedDigits) {
         Integer[] digits = Arrays.stream(input.split(operatorPattern.pattern())).map(d -> Integer.valueOf(d)).toArray(Integer[]::new);
-        String[] operators = (String[]) Arrays.stream(input.split(singleDigitPattern.pattern())).toArray();
-        System.out.println("Input digits: " + arrToString(digits));
+        String[] operators = Arrays.stream(input.split(singleDigitPattern.pattern())).filter(s -> s.isBlank()).toArray(String[]::new);
+        System.out.println(arrToString(digits));
+        System.out.println(arrToString(operators));
+        checkDigits(digits, allowedDigits);
         int result = digits[0];
         for (int i = 0; i < digits.length; i++) {
 
         }
         return false;
+    }
+
+    /**
+     * inputDigits must contain no other digits than found in allowedDigits
+     * inputDigits must contain all digits from allowedDigits at least once
+     * (or more if digit occurs multiple times in allowedDigits)
+     * @param inputDigits Digits put in by user
+     * @param allowedDigits Generated Digits
+     * throws IllegalArgumentException if input contains other digit than allowed
+     * throws IllegalArgumentException if input does not contain a digit from allowed
+     * returns if input is valid
+     */
+    private static void checkDigits(Integer[] inputDigits, Integer[] allowedDigits) {
+        //input: 1 1 2 3 4 4
+        //allowed: 1 2 3 4
+
+        //input: 1 2 2 4 4
+        //allowed: 1 2 4 4
+
+        //input: 1 1 2 1
+        //allowed: 1 1 1 2
+
+        String input = arrToString(inputDigits);
+        String allowed = arrToString(allowedDigits);
+        // for -> split; if allowed contains i
+
+        Arrays.sort(inputDigits);
+        Arrays.sort(allowedDigits);
+        //new inputDigits; foreach allowedDigits find allowed in input and delete; if not found => error
+        Integer[] newInput = inputDigits.clone();
+        for (Integer a: allowedDigits) {
+            //contains
+            int index = contains(newInput, a);
+            if(index==-1) {
+                // error: inputDigits misses a digit from allowedDigits.
+            } else {
+                // delete digit from inputDigits with index "index" (multiple occurrences of same digit in allowedDigits)
+                // => allowedDigits: 1 1 1 2
+                // X inputDigits: 1 2 2 2
+            }
+        }
+    }
+
+    private static int contains(Integer[] array, Integer a) {
+        for(int i = 0; i < array.length; i++) {
+            if(array[i].equals(a)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
