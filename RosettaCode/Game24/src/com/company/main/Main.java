@@ -24,7 +24,7 @@ public class Main {
                     .toArray(Integer[]::new);
             boolean inputCorrect = false;
 
-            String digitsStr = intArrToString(digits);
+            String digitsStr = arrToString(digits);
 
             do {
                 System.out.println("Put in a mathematical expression (+-/*) that evaluates to 24 with these 4 digits: " + digitsStr);
@@ -46,7 +46,7 @@ public class Main {
         } while(repeat(scanner.nextLine()));
     }
 
-    private static <G> String intArrToString(G[] arr) {
+    private static <G> String arrToString(G[] arr) {
         StringBuilder sb = new StringBuilder();
         for (G i: arr) {
             sb.append(i).append(", ");
@@ -69,7 +69,7 @@ public class Main {
     private static boolean checkExpression(String input) {
         Integer[] digits = Arrays.stream(input.split(operatorPattern.pattern())).map(d -> Integer.valueOf(d)).toArray(Integer[]::new);
         String[] operators = (String[]) Arrays.stream(input.split(singleDigitPattern.pattern())).toArray();
-        System.out.println("Input digits: " + intArrToString(digits));
+        System.out.println("Input digits: " + arrToString(digits));
         int result = digits[0];
         for (int i = 0; i < digits.length; i++) {
 
