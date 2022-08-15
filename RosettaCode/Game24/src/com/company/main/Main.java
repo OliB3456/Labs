@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 public class Main {
 
-    private static final Pattern singleDigitPattern = Pattern.compile("[0-9]{1,1}");
+    private static final Pattern singleDigitPattern = Pattern.compile("[1-9]{1,1}");
     private static final Pattern operatorPattern = Pattern.compile("[\\+\\-\\*/]{1,1}");
 
     public static void main(String[] args) {
@@ -17,8 +17,9 @@ public class Main {
         do {
             System.out.println("Generating 4 digits...");
             Integer[] digits = IntStream.generate(ThreadLocalRandom.current()::nextInt)
-                    .filter(i -> 0 <= i && i <= 9)
+                    .filter(i -> 0 < i && i <= 9)
                     .limit(4)
+                    .sorted()
                     //.peek(i -> System.out.println(""+i))
                     .boxed()
                     .toArray(Integer[]::new);
@@ -68,15 +69,29 @@ public class Main {
 
     private static boolean checkExpression(String input, Integer[] allowedDigits) {
         Integer[] digits = Arrays.stream(input.split(operatorPattern.pattern())).map(d -> Integer.valueOf(d)).toArray(Integer[]::new);
-        String[] operators = Arrays.stream(input.split(singleDigitPattern.pattern())).filter(s -> s.isBlank()).toArray(String[]::new);
+        String[] operators = Arrays.stream(input.split(singleDigitPattern.pattern())).filter(s -> !s.isBlank()).toArray(String[]::new);
         System.out.println(arrToString(digits));
         System.out.println(arrToString(operators));
-        checkDigits(digits, allowedDigits);
+        checkDigitswithStreams(digits, allowedDigits);
         int result = digits[0];
         for (int i = 0; i < digits.length; i++) {
 
         }
         return false;
+    }
+
+    private static void checkDigitswithStreams(Integer[] inputDigits, Integer[] allowedDigits) {
+        Integer[] distinctSortedInputDigits = Arrays.stream(inputDigits).sorted().distinct().toArray(Integer[]::new);
+        Arrays.stream(distinctSortedInputDigits).forEach(i -> {
+            if (contains(allowedDigits, i) == -1) {
+                throw new IllegalArgumentException("Input must not contain any other digit than the generated ones! Digit: " + i + " not found in generated ones: " + allowedDigits);
+            }
+        });
+        Arrays.stream(allowedDigits).forEach(i -> {
+            if (contains(distinctSortedInputDigits, i) == -1) {
+                throw new IllegalArgumentException("Input must contain every given digit at leas once! Digit: " + i + " not found in your input: " + inputDigits);
+            }
+        });
     }
 
     /**
