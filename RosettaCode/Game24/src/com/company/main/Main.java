@@ -28,19 +28,24 @@ public class Main {
             String digitsStr = arrToString(digits);
 
             do {
-                System.out.println("Put in a mathematical expression (+-/*) that evaluates to 24 with these 4 digits: " + digitsStr);
+                System.out.println("\nPut in a mathematical expression (+-/*) that evaluates to 24 with these 4 digits: " + digitsStr);
                 System.out.print("Expression: ");
                 String input = scanner.nextLine();
                 input = input.replaceAll(" ", "");
 
-                if(isExpression(input)) {
-                    System.out.println("Input is a valid mathematical expression...");
-                    inputCorrect = checkExpression(input, digits);
+                try {
+                    if (isExpression(input)) {
+                        System.out.println("Input is a valid mathematical expression...");
+                        inputCorrect = checkExpression(input, digits);
+                    }
+
+                    if (!inputCorrect) {
+                        System.out.println("The Expression does not evaluate to 24! RETRY\n");
+                    }
+                } catch(IllegalArgumentException iae) {
+                    System.out.println(iae.getMessage());
                 }
 
-                if(!inputCorrect) {
-                    System.out.println("The Expression does not evaluate to 24! RETRY\n");
-                }
             } while(!inputCorrect);
 
             System.out.println("Do you want to play another round?");
@@ -48,6 +53,10 @@ public class Main {
     }
 
     private static <G> String arrToString(G[] arr) {
+        if (arr.length == 0) {
+            return new String();
+        }
+
         StringBuilder sb = new StringBuilder();
         for (G i: arr) {
             sb.append(i).append(", ");
@@ -72,26 +81,17 @@ public class Main {
         String[] operators = Arrays.stream(input.split(singleDigitPattern.pattern())).filter(s -> !s.isBlank()).toArray(String[]::new);
         System.out.println(arrToString(digits));
         System.out.println(arrToString(operators));
-        checkDigitswithStreams(digits, allowedDigits);
-        int result = digits[0];
-        for (int i = 0; i < digits.length; i++) {
 
+        // Should never be true but just in case
+        if (digits.length != (operators.length + 1)) {
+            throw new IllegalArgumentException("Your input must start and end with a digit. Only single digits (1-9) and single operation symbols (+,-,*,/) are allowed! After every single digit a single operation symbol must follow!");
         }
-        return false;
-    }
 
-    private static void checkDigitswithStreams(Integer[] inputDigits, Integer[] allowedDigits) {
-        Integer[] distinctSortedInputDigits = Arrays.stream(inputDigits).sorted().distinct().toArray(Integer[]::new);
-        Arrays.stream(distinctSortedInputDigits).forEach(i -> {
-            if (contains(allowedDigits, i) == -1) {
-                throw new IllegalArgumentException("Input must not contain any other digit than the generated ones! Digit: " + i + " not found in generated ones: " + allowedDigits);
-            }
-        });
-        Arrays.stream(allowedDigits).forEach(i -> {
-            if (contains(distinctSortedInputDigits, i) == -1) {
-                throw new IllegalArgumentException("Input must contain every given digit at leas once! Digit: " + i + " not found in your input: " + inputDigits);
-            }
-        });
+        checkDigitswithStreams(digits, allowedDigits);
+
+        boolean is24 = doesExpressionEvaluateTo24(digits, operators);
+
+        return false;
     }
 
     /**
@@ -104,35 +104,18 @@ public class Main {
      * throws IllegalArgumentException if input does not contain a digit from allowed
      * returns if input is valid
      */
-    private static void checkDigits(Integer[] inputDigits, Integer[] allowedDigits) {
-        //input: 1 1 2 3 4 4
-        //allowed: 1 2 3 4
-
-        //input: 1 2 2 4 4
-        //allowed: 1 2 4 4
-
-        //input: 1 1 2 1
-        //allowed: 1 1 1 2
-
-        String input = arrToString(inputDigits);
-        String allowed = arrToString(allowedDigits);
-        // for -> split; if allowed contains i
-
-        Arrays.sort(inputDigits);
-        Arrays.sort(allowedDigits);
-        //new inputDigits; foreach allowedDigits find allowed in input and delete; if not found => error
-        Integer[] newInput = inputDigits.clone();
-        for (Integer a: allowedDigits) {
-            //contains
-            int index = contains(newInput, a);
-            if(index==-1) {
-                // error: inputDigits misses a digit from allowedDigits.
-            } else {
-                // delete digit from inputDigits with index "index" (multiple occurrences of same digit in allowedDigits)
-                // => allowedDigits: 1 1 1 2
-                // X inputDigits: 1 2 2 2
+    private static void checkDigitswithStreams(Integer[] inputDigits, Integer[] allowedDigits) {
+        Integer[] distinctSortedInputDigits = Arrays.stream(inputDigits).sorted().distinct().toArray(Integer[]::new);
+        Arrays.stream(distinctSortedInputDigits).forEach(i -> {
+            if (contains(allowedDigits, i) == -1) {
+                throw new IllegalArgumentException("Input must not contain any other digit than the generated ones! Digit: " + i + " not found in generated ones: " + arrToString(allowedDigits));
             }
-        }
+        });
+        Arrays.stream(allowedDigits).forEach(i -> {
+            if (contains(distinctSortedInputDigits, i) == -1) {
+                throw new IllegalArgumentException("Input must contain every given digit at leas once! Digit: " + i + " of given digits not found in your input: " + arrToString(inputDigits));
+            }
+        });
     }
 
     private static int contains(Integer[] array, Integer a) {
@@ -142,5 +125,33 @@ public class Main {
             }
         }
         return -1;
+    }
+
+    // TODO: */ before +-
+    private static boolean doesExpressionEvaluateTo24(Integer[] digits, String[] operators) {
+        Integer result = digits[0];
+        for (int i = 1; i < digits.length; i++) {
+            result = performMathematicalOperation(result, digits[i], operators[i-1]);
+        }
+        System.out.println(result);
+        return result.equals(Integer.valueOf(24));
+    }
+
+    private static Integer performMathematicalOperation(Integer first, Integer second, String operator) {
+        switch (operator) {
+            case "+":
+                first += second;
+                break;
+            case "-":
+                first -= second;
+                break;
+            case "*":
+                first *= second;
+                break;
+            case "/":
+                first /= second;
+                break;
+        }
+        return first;
     }
 }
